@@ -6,7 +6,7 @@ class DataBaseHelper {
   Future<Database> initializedDataBase() async {
     sqfliteFfiInit();
     var databaseFactory = databaseFactoryFfi;
-
+  
     var database = await databaseFactory.openDatabase('sistema_reservas.db', options: OpenDatabaseOptions(
       version: 1,
       onCreate: (db, version) async {
@@ -58,4 +58,20 @@ class DataBaseHelper {
     print('Database initialized');
     return database;
   }
+
+  Future<void> insertUser(String name, String email, String password) async {
+    final db = await initializedDataBase();
+    await db.insert(
+      'user',
+      {
+        'name': name,
+        'email': email,
+        'password': password,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    print('User inserted');
+  }
+
+
 }
