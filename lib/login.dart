@@ -84,6 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 child: Text('Login'),
               ),
+               SizedBox(height: 10), 
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
@@ -93,8 +94,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 },
                 child: Text('Create Account'),
               ),
+               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
+                  Navigator.pushNamed(context, '/rent_prop');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Logado sem cadastro')),
                   );
