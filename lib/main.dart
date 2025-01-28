@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
-import 'intermed.dart'; // Certifique-se de que o arquivo intermed.dart está no local correto
+import 'intermed.dart'; 
+import 'app1/create_prop.dart';
+import 'app2/rent_prop.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +22,9 @@ class MyApp extends StatelessWidget {
       initialRoute: '/', // Define a rota inicial
       routes: {
         '/': (context) => LoginScreen(),
-        '/intermed': (context) => Intermediario(), // Registra a rota intermed
+        '/intermed': (context) => Intermediario(),
+        '/create_prop': (context) => CreateProperty(),
+        '/rent_prop': (context) => RentProperty(),
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
