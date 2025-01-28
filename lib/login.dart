@@ -13,25 +13,31 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   Future<void> _validateLogin() async {
+  try {
     var db = DataBaseHelper();
     final username = _usernameController.text;
     final password = _passwordController.text;
 
-    // Simulate a database check
     final isValid = await db.checkCredentials(username, password);
 
     if (isValid != null) {
-      // Login successful
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login realizado com sucesso')),
       );
+      Navigator.pushNamed(context, '/intermed');
     } else {
-      // Login failed
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Usuário ou senha inválidos')),
       );
     }
+  } catch (e) {
+    // Log e exiba uma mensagem amigável
+    print("Erro ao validar login: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Erro ao processar o login. Tente novamente.')),
+    );
   }
+}
 
 
   @override
@@ -86,6 +92,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   );
                 },
                 child: Text('Create Account'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Logado sem cadastro')),
+                  );
+                },
+                child: Text('Logar sem cadastro'),
               ),
             ],
           ),
