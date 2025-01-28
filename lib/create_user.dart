@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'data_base.dart';
 
 class CreateUserScreen extends StatefulWidget {
-
   @override
   _CreateUserScreenState createState() => _CreateUserScreenState();
 }
@@ -24,14 +24,11 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     if (_formKey.currentState!.validate()) {
       // Process data
       String name = _nameController.text;
-      //String email = _emailController.text;
-      //String password = _passwordController.text;
-
+      String email = _emailController.text;
+      String password = _passwordController.text;
+      var db = DataBaseHelper();
+      db.insertUser(name, email, password);
       // You can add your user creation logic here
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User Created: $name')),
-      );
     }
   }
 
