@@ -19,14 +19,14 @@ class _IntermediarioState extends State<Intermediario> {
         children: [
           ElevatedButton(
             onPressed: () {
-              // Add your onPressed code here!
+                Navigator.pushNamed(context, '/create_prop');
             },
             child: Text('Cadastrar propriedade'),
           ),
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
-              // Add your onPressed code here!
+              Navigator.pushNamed(context, '/rent_prop');
             },
             child: Text('Reservar propriedade'),
           ),
