@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 
@@ -6,8 +7,8 @@ class DataBaseHelper {
   Future<Database> initializedDataBase() async {
     sqfliteFfiInit();
     var databaseFactory = databaseFactoryFfi;
-  
-    var database = await databaseFactory.openDatabase('sistema_reservas.db', options: OpenDatabaseOptions(
+    var path = '${Directory.current.path}/sistema_reservas.db';
+    var database = await databaseFactory.openDatabase(path, options: OpenDatabaseOptions(
       version: 1,
       onCreate: (db, version) async {
         await db.execute('''CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT, 
