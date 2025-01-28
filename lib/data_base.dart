@@ -75,4 +75,22 @@ class DataBaseHelper {
   }
 
 
+  Future<Map<String, dynamic>?> checkCredentials(String name, String password) async {
+    final db = await initializedDataBase();
+    final List<Map<String, dynamic>> maps = await db.query(
+      'user',
+      where: 'name = ? AND password = ?',
+      whereArgs: [name, password],
+    );
+
+    if (maps.isNotEmpty) {
+      print('User found');
+      return maps.first;
+    } else {
+      print('User not found');
+      return null;
+    }
+  }
+
+
 }

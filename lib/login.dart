@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'create_user.dart';
+import 'data_base.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -10,6 +11,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+  Future<void> _validateLogin() async {
+    var db = DataBaseHelper();
+    final username = _usernameController.text;
+    final password = _passwordController.text;
+
+    // Simulate a database check
+    final isValid = await db.checkCredentials(username, password);
+
+    if (isValid != null) {
+      // Login successful
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login realizado com sucesso')),
+      );
+    } else {
+      // Login failed
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Usuário ou senha inválidos')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +71,9 @@ class _LoginScreenState extends State<LoginScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    _validateLogin();
+                  }
                   if (/*Criar o validador no banco*/ true) {}
                 },
                 child: Text('Login'),
