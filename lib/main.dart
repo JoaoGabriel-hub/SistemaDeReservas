@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'login.dart';
 import 'intermed.dart'; 
-import 'app1/create_prop.dart';
+import 'app1/main_manage_prop.dart';
 import 'app2/rent_prop.dart';
+import 'app1/create.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,8 +24,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => LoginScreen(),
         '/intermed': (context) => Intermediario(),
-        '/create_prop': (context) => CreateProperty(),
+        '/manage_prop': (context) => ManageProperty(),
         '/rent_prop': (context) => RentProperty(),
+        '/create_prop' : (context) => CreatePropertyScreen(),
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
