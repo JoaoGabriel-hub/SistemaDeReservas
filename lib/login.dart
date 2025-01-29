@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projetofinal/logged_user.dart';
 import 'create_user.dart';
 import 'data_base.dart';
 
@@ -18,9 +19,13 @@ class _LoginScreenState extends State<LoginScreen> {
     final username = _usernameController.text;
     final password = _passwordController.text;
 
-    final isValid = await db.checkCredentials(username, password);
+    final user = await db.checkCredentials(username, password);
+    
+    if (!mounted) return;
 
-    if (isValid != null) {
+    if (user != null) {
+      int userId = user['id'];
+      LoggedUser().setUser(userId);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login realizado com sucesso')),
       );
