@@ -20,14 +20,24 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       // Process data
       String name = _nameController.text;
       String email = _emailController.text;
       String password = _passwordController.text;
       var db = DataBaseHelper();
-      db.insertUser(name, email, password);
+      var userCreated = await db.insertUser(name, email, password);
+      if(userCreated){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Usuário criado com sucesso')),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao criar usuário')),
+        );
+      }
       // You can add your user creation logic here
     }
   }
@@ -61,9 +71,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter an email';
                   }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
+                  
                   return null;
                 },
               ),
@@ -75,9 +83,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a password';
                   }
-                  if (value.length < 6) {
-                    return 'Password must be at least 6 characters long';
-                  }
+                  
                   return null;
                 },
               ),
