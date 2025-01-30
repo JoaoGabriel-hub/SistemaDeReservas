@@ -130,8 +130,6 @@ class DataBaseHelper {
     print('Property inserted');
   }
 
-
-
   Future<int> createAdress(String cep) async {
     final response = await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
 
@@ -160,6 +158,25 @@ class DataBaseHelper {
     } else {
       throw Exception('Erro ao buscar o CEP');
     }
+  }
+
+  Future<List<Map<String, dynamic>>> getUserProperties() async {
+    final db = await initializedDataBase();
+    int? userId = LoggedUser().id;
+
+    final List<Map<String, dynamic>> properties = await db.query(
+      'property',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+    );
+
+    if (properties.isNotEmpty) {
+      print('Properties found');
+      return properties;
+    } else {
+      print('No properties found for this user');
+      return [];
     }
   }
+}
 

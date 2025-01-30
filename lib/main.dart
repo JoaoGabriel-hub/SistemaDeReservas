@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:projetofinal/app1/list.dart';
 import 'login.dart';
 import 'intermed.dart'; 
 import 'app1/main_manage_prop.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
         '/manage_prop': (context) => ManageProperty(),
         '/rent_prop': (context) => RentProperty(),
         '/create_prop' : (context) => CreatePropertyScreen(),
+        '/list_prop' : (context) => ListPropertiesScreen(),
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
