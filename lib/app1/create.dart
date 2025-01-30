@@ -131,7 +131,7 @@ class CreatePropertyScreen extends StatelessWidget {
                       double.parse(_priceController.text),
                       int.parse(_maxGuestController.text),
                       _thumbnailController.text,
-                      int.parse(_cepController.text),
+                      _cepController.text,
                     );
                   }
                 },

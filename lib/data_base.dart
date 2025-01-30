@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:projetofinal/logged_user.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 class DataBaseHelper {
   Future<Database> initializedDataBase() async {
     sqfliteFfiInit();
@@ -106,15 +107,16 @@ class DataBaseHelper {
       double price,
       int maxGuest,
       String thumbnail,
-      int cep) async {
+      String cep) async {
     final db = await initializedDataBase();
     int? userId = LoggedUser().id;
     //Consumir API do cep para obter o endereço completo
+    var adressId = await createAdress(cep);
     await db.insert(
       'property',
       {
         'user_id': userId,
-        'address_id': 'addressId',
+        'address_id': adressId,
         'title': title,
         'description': description,
         'number': number,
@@ -127,4 +129,37 @@ class DataBaseHelper {
     );
     print('Property inserted');
   }
-}
+
+
+
+  Future<int> createAdress(String cep) async {
+    final response = await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+
+      if (data['erro'] != null) {
+        throw Exception('CEP não encontrado');
+      }
+
+      final db = await initializedDataBase();
+      final addressId = await db.insert(
+        'address',
+        {
+          'cep': data['cep'],
+          'logradouro': data['logradouro'],
+          'bairro': data['bairro'],
+          'localidade': data['localidade'],
+          'uf': data['uf'],
+          'estado': data['estado'], // Assuming 'estado' is the same as 'uf'
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      return addressId;
+    } else {
+      throw Exception('Erro ao buscar o CEP');
+    }
+    }
+  }
+
