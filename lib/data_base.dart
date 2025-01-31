@@ -178,5 +178,20 @@ class DataBaseHelper {
       return [];
     }
   }
+
+
+  Future<List<Map<String, dynamic>>> getAllProperties() async {
+  final db = await initializedDataBase();
+  final List<Map<String, dynamic>> properties = await db.query('property');
+
+  if (properties.isNotEmpty) {
+    print('Properties found');
+    return properties;
+  } else {
+    print('No properties found');
+    return [];
+  }
+}
+
 }
 
