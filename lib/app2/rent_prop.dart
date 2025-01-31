@@ -84,6 +84,18 @@ class _RentPropertyState extends State<RentProperty> {
                                   ),
                                   SizedBox(height: 8),
                                   Text(
+                                    'UF: ${property['uf'].toString()}',
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                  Text(
+                                    'Localidade: ${property['localidade'].toString()}',
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                  Text(
+                                    'Bairro: ${property['bairro'].toString()}',
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                  Text(
                                     'Máximo de hóspedes: ${property['max_guest'].toString()}',
                                     style: TextStyle(color: Colors.grey[600]),
                                   ),
