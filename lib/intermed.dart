@@ -27,6 +27,7 @@ class _IntermediarioState extends State<Intermediario> {
           SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
+              print(LoggedUser().id);
               Navigator.pushNamed(context, '/rent_prop');
             },
             child: Text('Reservar propriedade'),

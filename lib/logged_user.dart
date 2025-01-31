@@ -11,4 +11,10 @@ class LoggedUser { //Classe que armazena o usuário logado
   void setUser(int userId) {
     id = userId;
   }
+
+  void logout() {
+    id = null;
+    // Lógica para deslogar o usuário
+    print('Usuário deslogado');
+  }
 }
