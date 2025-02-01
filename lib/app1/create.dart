@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:projetofinal/data_base.dart';
+import 'main_manage_prop.dart';
 
 class CreatePropertyScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -51,7 +52,9 @@ class CreatePropertyScreen extends StatelessWidget {
                 decoration: InputDecoration(labelText: 'Número'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty || int.tryParse(value) == null) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      int.tryParse(value) == null) {
                     return 'Por favor, insira um número válido';
                   }
                   return null;
@@ -72,8 +75,10 @@ class CreatePropertyScreen extends StatelessWidget {
                 decoration: InputDecoration(labelText: 'Preço'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
-                  if (value == null || value.isEmpty || double.tryParse(value) == null) {
-                    return 'Por favor, insira um preço válido' ;
+                  if (value == null ||
+                      value.isEmpty ||
+                      double.tryParse(value) == null) {
+                    return 'Por favor, insira um preço válido';
                   }
                   return null;
                 },
@@ -86,7 +91,7 @@ class CreatePropertyScreen extends StatelessWidget {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor, insira o máximo de convidados';
-                  }else if(int.tryParse(value) == null){
+                  } else if (int.tryParse(value) == null) {
                     return 'Por favor, insira um número válido';
                   }
                   return null;
@@ -103,27 +108,26 @@ class CreatePropertyScreen extends StatelessWidget {
                   return null;
                 },
               ),
-              
+
               SizedBox(height: 20), // Espaçamento adicionado
               TextFormField(
                 controller: _cepController,
                 decoration: InputDecoration(labelText: 'CEP'),
                 validator: (value) {
-                  
-                  if (value == null || value.isEmpty || int.tryParse(value) == null) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      int.tryParse(value) == null) {
                     return 'Por favor, insira um CEP válido';
                   }
                   return null;
                 },
-                
               ),
               SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    
                     var db = DataBaseHelper();
-                    db.insertProperty(
+                    await db.insertProperty(
                       _titleController.text,
                       _descriptionController.text,
                       int.parse(_numberController.text),
@@ -132,6 +136,10 @@ class CreatePropertyScreen extends StatelessWidget {
                       int.parse(_maxGuestController.text),
                       _thumbnailController.text,
                       _cepController.text,
+                    );
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => ManageProperty()),
                     );
                   }
                 },

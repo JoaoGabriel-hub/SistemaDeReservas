@@ -29,6 +29,11 @@ class _RentPropertyState extends State<RentProperty> {
     }
   }
 
+  bool _isValidUrl(String url) {
+    final Uri? uri = Uri.tryParse(url);
+    return uri != null && uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,10 +71,11 @@ class _RentPropertyState extends State<RentProperty> {
                     itemCount: _properties.length,
                     itemBuilder: (context, index) {
                       var property = _properties[index];
-                      return Card(
-                        margin: EdgeInsets.all(10),
-                        child: ListTile(
-                          title: Text(
+                      return Container(
+                        margin: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        child: Card(
+                          child: ListTile(
+                            title: Text(
                               property['title'],
                               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                             ),
@@ -111,11 +117,22 @@ class _RentPropertyState extends State<RentProperty> {
                                     'Complemento: ${property['complement'] ?? 'Não possui'}',
                                     style: TextStyle(color: Colors.grey[600]),
                                   ),
+                                  if (_isValidUrl(property['thumbnail']))
+                                    Image.network(
+                                      property['thumbnail'],
+                                      width: 200,
+                                      height: 150,
+                                      fit: BoxFit.cover,
+                                    )
                                 ],
                               ),
                             ),
-                          ) 
-                       );
+                            onTap: () {
+                              // Ação ao clicar na propriedade
+                            },
+                          ),
+                        ),
+                      );
                     },
                   ),
           ),
