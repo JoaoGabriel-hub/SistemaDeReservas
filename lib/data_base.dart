@@ -3,6 +3,7 @@ import 'package:projetofinal/logged_user.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
 class DataBaseHelper {
   Future<Database> initializedDataBase() async {
     sqfliteFfiInit();
@@ -107,12 +108,13 @@ class DataBaseHelper {
       double price,
       int maxGuest,
       String thumbnail,
-      String cep) async {
+      String cep,
+      List<String> images) async {
     final db = await initializedDataBase();
     int? userId = LoggedUser().id;
     //Consumir API do cep para obter o endereço completo
     var adressId = await createAdress(cep);
-    await db.insert(
+    var propertyId = await db.insert(
       'property',
       {
         'user_id': userId,
@@ -128,12 +130,24 @@ class DataBaseHelper {
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     print('Property inserted');
+
+    for (var image in images) {
+      await db.insert(
+        'images',
+        {
+          'property_id': propertyId,
+          'path': image,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
   }
 
   Future<int> createAdress(String cep) async {
     final db = await initializedDataBase();
 
-    final response = await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
+    final response =
+        await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -142,17 +156,13 @@ class DataBaseHelper {
         throw Exception('CEP não encontrado');
       }
 
-      var isCepInDatabase = await db.query(
-      'address',
-      where: 'cep = ?',
-      whereArgs: [data['cep']],
-      limit: 1
-      );
+      var isCepInDatabase = await db.query('address',
+          where: 'cep = ?', whereArgs: [data['cep']], limit: 1);
 
       if (isCepInDatabase.isNotEmpty) {
         return isCepInDatabase.first['id'] as int;
       }
-      
+
       final addressId = await db.insert(
         'address',
         {
@@ -191,10 +201,9 @@ class DataBaseHelper {
     }
   }
 
-
   Future<List<Map<String, dynamic>>> getAllProperties() async {
-  final db = await initializedDataBase();
-  final List<Map<String, dynamic>> properties = await db.rawQuery('''
+    final db = await initializedDataBase();
+    final List<Map<String, dynamic>> properties = await db.rawQuery('''
     SELECT 
       property.*, 
       address.uf, 
@@ -204,13 +213,13 @@ class DataBaseHelper {
     JOIN address ON property.address_id = address.id
   ''');
 
-  if (properties.isNotEmpty) {
-    print('Properties found');
-    return properties;
-  } else {
-    print('No properties found');
-    return [];
-  }
+    if (properties.isNotEmpty) {
+      print('Properties found');
+      return properties;
+    } else {
+      print('No properties found');
+      return [];
+    }
   }
 
   Future<void> deleteProperty(int propertyId) async {
@@ -249,6 +258,4 @@ class DataBaseHelper {
     );
     print('Property updated');
   }
-
 }
-

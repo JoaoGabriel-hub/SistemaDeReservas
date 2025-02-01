@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:projetofinal/data_base.dart';
+import 'package:image_picker/image_picker.dart'; // Importação adicionada
+import 'dart:io'; // Importação adicionada
 import 'main_manage_prop.dart';
 
-class CreatePropertyScreen extends StatelessWidget {
+class CreatePropertyScreen extends StatefulWidget { // Alterado para StatefulWidget
+  @override
+  _CreatePropertyScreenState createState() => _CreatePropertyScreenState();
+}
+
+class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
@@ -12,6 +19,24 @@ class CreatePropertyScreen extends StatelessWidget {
   final _maxGuestController = TextEditingController();
   final _thumbnailController = TextEditingController();
   final _cepController = TextEditingController();
+  final List<File?> _imageFiles = [null]; // Lista de arquivos de imagem
+
+  final ImagePicker _picker = ImagePicker(); // Instância do ImagePicker
+
+  void _addImageField() {
+    setState(() {
+      _imageFiles.add(null);
+    });
+  }
+
+  Future<void> _pickImage(int index) async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFiles[index] = File(pickedFile.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,8 +133,7 @@ class CreatePropertyScreen extends StatelessWidget {
                   return null;
                 },
               ),
-
-              SizedBox(height: 20), // Espaçamento adicionado
+              
               TextFormField(
                 controller: _cepController,
                 decoration: InputDecoration(labelText: 'CEP'),
@@ -121,6 +145,32 @@ class CreatePropertyScreen extends StatelessWidget {
                   }
                   return null;
                 },
+              ),
+              SizedBox(height: 20),
+              Text('Imagens Adicionais'),
+              Column(
+                children: _imageFiles.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  File? file = entry.value;
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Column(
+                      children: [
+                        file == null
+                            ? Text('Nenhuma imagem selecionada.')
+                            : Image.file(file, height: 100),
+                        TextButton(
+                          onPressed: () => _pickImage(index),
+                          child: Text('Selecionar Imagem'),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+              TextButton(
+                onPressed: _addImageField,
+                child: Text('Adicionar Imagem'),
               ),
               SizedBox(height: 20),
               ElevatedButton(
@@ -136,6 +186,7 @@ class CreatePropertyScreen extends StatelessWidget {
                       int.parse(_maxGuestController.text),
                       _thumbnailController.text,
                       _cepController.text,
+                      _imageFiles.where((file) => file != null).map((file) => file!.path).toList(),
                     );
                     Navigator.pushReplacement(
                       context,
