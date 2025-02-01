@@ -131,6 +131,8 @@ class DataBaseHelper {
   }
 
   Future<int> createAdress(String cep) async {
+    final db = await initializedDataBase();
+
     final response = await http.get(Uri.parse('https://viacep.com.br/ws/$cep/json/'));
 
     if (response.statusCode == 200) {
@@ -140,7 +142,17 @@ class DataBaseHelper {
         throw Exception('CEP não encontrado');
       }
 
-      final db = await initializedDataBase();
+      var isCepInDatabase = await db.query(
+      'address',
+      where: 'cep = ?',
+      whereArgs: [data['cep']],
+      limit: 1
+      );
+
+      if (isCepInDatabase.isNotEmpty) {
+        return isCepInDatabase.first['id'] as int;
+      }
+      
       final addressId = await db.insert(
         'address',
         {
@@ -199,7 +211,17 @@ class DataBaseHelper {
     print('No properties found');
     return [];
   }
-}
+  }
+
+  Future<void> deleteProperty(int propertyId) async {
+    final db = await initializedDataBase();
+    await db.delete(
+      'property',
+      where: 'id = ?',
+      whereArgs: [propertyId],
+    );
+    print('Property deleted');
+  }
 
 }
 
