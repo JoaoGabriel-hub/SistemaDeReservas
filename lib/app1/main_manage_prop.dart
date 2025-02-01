@@ -33,14 +33,14 @@ class _ManagePropertyState extends State<ManageProperty> {
             SizedBox(height: 20), // Espaçamento adicionado
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/create_prop');
+                Navigator.pushNamed(context, '/delete_prop');
               },
               child: Text('Remover Propriedade'),
             ),
             SizedBox(height: 20), // Espaçamento adicionado
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/create_prop');
+                Navigator.pushNamed(context, '/edit_prop');
               },
               child: Text('Editar Propriedade'),
             ),
