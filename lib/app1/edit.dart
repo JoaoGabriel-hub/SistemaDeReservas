@@ -12,12 +12,145 @@ class EditPropertiesScreen extends StatelessWidget {
     final Uri? uri = Uri.tryParse(url);
     return uri != null && uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
   }
+
+  void _showEditDialog(BuildContext context, Map<String, dynamic> property) {
+    final formKey = GlobalKey<FormState>();
+    final titleController = TextEditingController(text: property['title']);
+    final descriptionController = TextEditingController(text: property['description']);
+    final maxGuestController = TextEditingController(text: property['max_guest'].toString());
+    final priceController = TextEditingController(text: property['price'].toString());
+    final numberController = TextEditingController(text: property['number'].toString());
+    final complementController = TextEditingController(text: property['complement']);
+    final thumbnailController = TextEditingController(text: property['thumbnail']);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Editar Propriedade'),
+          content: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: titleController,
+                    decoration: InputDecoration(labelText: 'Título'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira um título válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(labelText: 'Descrição'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira uma descrição válida';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: maxGuestController,
+                    decoration: InputDecoration(labelText: 'Máximo de Hóspedes'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty || int.tryParse(value) == null) {
+                        return 'Por favor, insira um número válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: priceController,
+                    decoration: InputDecoration(labelText: 'Preço'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty || double.tryParse(value) == null) {
+                        return 'Por favor, insira um preço válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: numberController,
+                    decoration: InputDecoration(labelText: 'Número'),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty || int.tryParse(value) == null) {
+                        return 'Por favor, insira um número válido';
+                      }
+                      return null;
+                    },
+                  ),
+                  TextFormField(
+                    controller: complementController,
+                    decoration: InputDecoration(labelText: 'Complemento'),
+                  ),
+                  TextFormField(
+                    controller: thumbnailController,
+                    decoration: InputDecoration(labelText: 'URL da Imagem'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty || !_isValidUrl(value)) {
+                        return 'Por favor, insira uma URL válida';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  var db = DataBaseHelper();
+                  db.updateProperty(
+                    property['id'],
+                    titleController.text,
+                    descriptionController.text,
+                    int.parse(numberController.text),
+                    complementController.text,
+                    double.parse(priceController.text),
+                    int.parse(maxGuestController.text),
+                    thumbnailController.text
+                    
+                  );
+                  Navigator.of(context).pop();
+                  // Recarregar a página
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => EditPropertiesScreen()),
+                  );
+                } else {
+                  // Mostrar mensagem de erro
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Todos os campos devem ser preenchidos de forma correta')),
+                  );
+                }
+              },
+              child: Text('Salvar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lista de Propriedades'),
+        title: Text('Edição de Propriedades'),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _fetchProperties(),
@@ -77,6 +210,7 @@ class EditPropertiesScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                    onTap: () => _showEditDialog(context, property),
                     contentPadding: EdgeInsets.symmetric(vertical: 15, horizontal: 15),
                     tileColor: Colors.grey[200],
                     shape: RoundedRectangleBorder(

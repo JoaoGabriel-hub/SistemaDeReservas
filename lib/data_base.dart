@@ -223,5 +223,32 @@ class DataBaseHelper {
     print('Property deleted');
   }
 
+  Future<void> updateProperty(
+      int propertyId,
+      String title,
+      String description,
+      int number,
+      String? complement,
+      double price,
+      int maxGuest,
+      String thumbnail) async {
+    final db = await initializedDataBase();
+    await db.update(
+      'property',
+      {
+        'title': title,
+        'description': description,
+        'number': number,
+        'complement': complement,
+        'price': price,
+        'max_guest': maxGuest,
+        'thumbnail': thumbnail,
+      },
+      where: 'id = ?',
+      whereArgs: [propertyId],
+    );
+    print('Property updated');
+  }
+
 }
 
