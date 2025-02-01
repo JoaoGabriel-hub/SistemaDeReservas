@@ -57,7 +57,7 @@ class DeletePropertiesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lista de Propriedades'),
+        title: Text('Remoção de Propriedades'),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _fetchProperties(),

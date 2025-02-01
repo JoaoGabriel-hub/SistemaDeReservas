@@ -10,7 +10,7 @@ class _ManagePropertyState extends State<ManageProperty> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Property'),
+        title: Text('Manage Property'),
       ),
       body: Center(
         child: Column(
