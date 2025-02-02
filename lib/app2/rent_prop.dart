@@ -128,7 +128,11 @@ class _RentPropertyState extends State<RentProperty> {
                               ),
                             ),
                             onTap: () {
-                              // Ação ao clicar na propriedade
+                              Navigator.pushNamed(
+                                context,
+                                '/each_prop',
+                                arguments: property,
+                              );
                             },
                           ),
                         ),
