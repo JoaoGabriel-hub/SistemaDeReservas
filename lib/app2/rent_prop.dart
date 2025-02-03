@@ -15,6 +15,12 @@ class _RentPropertyState extends State<RentProperty> {
   final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _maxGuestController = TextEditingController();
 
+  bool _showFilters = false;
+  bool _filterUF = false;
+  bool _filterBairro = false;
+  bool _filterCidade = false;
+  bool _filterMaxGuests = false;
+
   @override
   void initState() {
     super.initState();
@@ -33,7 +39,7 @@ class _RentPropertyState extends State<RentProperty> {
       print("Erro ao carregar propriedades: $e");
     }
   }
-
+  
   bool _isValidUrl(String url) {
     final Uri? uri = Uri.tryParse(url);
     return uri != null && uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
@@ -47,10 +53,10 @@ class _RentPropertyState extends State<RentProperty> {
 
     setState(() {
       _filteredProperties = _properties.where((property) {
-        bool matchesUF = uf.isEmpty || property['uf'].toString().toLowerCase().contains(uf);
-        bool matchesBairro = bairro.isEmpty || property['bairro'].toString().toLowerCase().contains(bairro);
-        bool matchesCidade = cidade.isEmpty || property['localidade'].toString().toLowerCase().contains(cidade);
-        bool matchesMaxGuests = maxGuests == null || property['max_guest'] >= maxGuests;
+        bool matchesUF = !_filterUF || uf.isEmpty || property['uf'].toString().toLowerCase().contains(uf);
+        bool matchesBairro = !_filterBairro || bairro.isEmpty || property['bairro'].toString().toLowerCase().contains(bairro);
+        bool matchesCidade = !_filterCidade || cidade.isEmpty || property['localidade'].toString().toLowerCase().contains(cidade);
+        bool matchesMaxGuests = !_filterMaxGuests || maxGuests == null || property['max_guest'] >= maxGuests;
 
         return matchesUF && matchesBairro && matchesCidade && matchesMaxGuests;
       }).toList();
@@ -79,35 +85,84 @@ class _RentPropertyState extends State<RentProperty> {
             ),
           ),
 
-          // Campos de busca
+          // Botão para exibir/ocultar filtros
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _ufController,
-                  decoration: InputDecoration(labelText: 'Buscar por UF'),
-                  onChanged: (value) => _filterProperties(),
-                ),
-                TextField(
-                  controller: _bairroController,
-                  decoration: InputDecoration(labelText: 'Buscar por Bairro'),
-                  onChanged: (value) => _filterProperties(),
-                ),
-                TextField(
-                  controller: _cidadeController,
-                  decoration: InputDecoration(labelText: 'Buscar por Cidade'),
-                  onChanged: (value) => _filterProperties(),
-                ),
-                TextField(
-                  controller: _maxGuestController,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(labelText: 'Máximo de Hóspedes'),
-                  onChanged: (value) => _filterProperties(),
-                ),
-              ],
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _showFilters = !_showFilters;
+                });
+              },
+              child: Text(_showFilters ? 'Ocultar Filtros' : 'Buscar por'),
             ),
           ),
+
+          // Campos de filtro (exibidos apenas se ativados)
+          if (_showFilters)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+              child: Column(
+                children: [
+                  CheckboxListTile(
+                    title: Text('Buscar por UF'),
+                    value: _filterUF,
+                    onChanged: (value) {
+                      setState(() => _filterUF = value!);
+                    },
+                  ),
+                  if (_filterUF)
+                    TextField(
+                      controller: _ufController,
+                      decoration: InputDecoration(labelText: 'Digite a UF'),
+                      onChanged: (value) => _filterProperties(),
+                    ),
+
+                  CheckboxListTile(
+                    title: Text('Buscar por Bairro'),
+                    value: _filterBairro,
+                    onChanged: (value) {
+                      setState(() => _filterBairro = value!);
+                    },
+                  ),
+                  if (_filterBairro)
+                    TextField(
+                      controller: _bairroController,
+                      decoration: InputDecoration(labelText: 'Digite o Bairro'),
+                      onChanged: (value) => _filterProperties(),
+                    ),
+
+                  CheckboxListTile(
+                    title: Text('Buscar por Cidade'),
+                    value: _filterCidade,
+                    onChanged: (value) {
+                      setState(() => _filterCidade = value!);
+                    },
+                  ),
+                  if (_filterCidade)
+                    TextField(
+                      controller: _cidadeController,
+                      decoration: InputDecoration(labelText: 'Digite a Cidade'),
+                      onChanged: (value) => _filterProperties(),
+                    ),
+
+                  CheckboxListTile(
+                    title: Text('Máximo de Hóspedes'),
+                    value: _filterMaxGuests,
+                    onChanged: (value) {
+                      setState(() => _filterMaxGuests = value!);
+                    },
+                  ),
+                  if (_filterMaxGuests)
+                    TextField(
+                      controller: _maxGuestController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(labelText: 'Digite o máximo de hóspedes'),
+                      onChanged: (value) => _filterProperties(),
+                    ),
+                ],
+              ),
+            ),
 
           Expanded(
             child: _filteredProperties.isEmpty
