@@ -65,6 +65,15 @@ class EachProperty extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
+                Spacer(),
+                Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                  // Ação ao clicar no botão
+                  },
+                  child: Text('Reservar'),
+                ),
+              ),
           ],
         ),
       ),
