@@ -5,6 +5,7 @@ import 'intermed.dart';
 import 'app1/main_manage_prop.dart';
 import 'app2/rent_prop.dart';
 import 'app2/each_prop.dart';
+import 'app2/reservations.dart';
 import 'app1/create.dart';
 import 'app1/delete.dart';
 import 'app1/edit.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         '/delete_prop': (context) => DeletePropertiesScreen(),
         '/edit_prop': (context) => EditPropertiesScreen(),
         '/each_prop': (context) => EachProperty(),
+        '/reservations': (context) => Reservations(),
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
