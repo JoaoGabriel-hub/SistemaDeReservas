@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:projetofinal/data_base.dart';
+import 'package:intl/intl.dart';
 
 class EachProperty extends StatefulWidget {
   @override
@@ -6,20 +8,63 @@ class EachProperty extends StatefulWidget {
 }
 
 class _EachPropertyState extends State<EachProperty> {
+  Map<String, dynamic>? property;
+  final DataBaseHelper _dbHelper = DataBaseHelper();
+  DateTime? _checkinDate;
+  DateTime? _checkoutDate;
+  int _guests = 1;
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    property ??= ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+  }
 
+  Future<void> _selectDate(BuildContext context, bool isCheckin) async {
+    DateTime initialDate = DateTime.now();
+    DateTime firstDate = DateTime.now();
+    DateTime lastDate = DateTime.now().add(Duration(days: 365));
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+    if (pickedDate != null && pickedDate != (isCheckin ? _checkinDate : _checkoutDate)) {
+      setState(() {
+        if (isCheckin) {
+          _checkinDate = pickedDate;
+          if (_checkoutDate != null && _checkoutDate!.isBefore(_checkinDate!)) {
+            _checkoutDate = null;
+          }
+        } else {
+          _checkoutDate = pickedDate;
+        }
+      });
+    }
+  }
 
+  void _bookProperty() async {
+    if (property == null || _checkinDate == null || _checkoutDate == null) return;
+    int propertyId = property!['id'];
+    String checkinDate = DateFormat('yyyy-MM-dd').format(_checkinDate!);
+    String checkoutDate = DateFormat('yyyy-MM-dd').format(_checkoutDate!);
 
+    bool success = await _dbHelper.insertBooking(propertyId, checkinDate, checkoutDate, _guests);
+    
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Reserva realizada com sucesso!")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Falha ao realizar a reserva. Escolha outras datas.")),
+      );
+    }
+  }
 
-
-
-  
   @override
   Widget build(BuildContext context) {
-    // Obtém os argumentos passados pelo Navigator
-    final Map<String, dynamic>? property =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
     if (property == null) {
       return Scaffold(
         appBar: AppBar(title: Text("Detalhes da Propriedade")),
@@ -28,65 +73,76 @@ class _EachPropertyState extends State<EachProperty> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(property['title'] ?? 'Detalhes da Propriedade')),
+      appBar: AppBar(title: Text(property!['title'] ?? 'Detalhes da Propriedade')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'Nome: ${property['title']}',
+              'Nome: ${property!['title']}',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             Text(
-              'Localização: ${property['localidade']}',
+              'Localização: ${property!['localidade']}',
               style: TextStyle(fontSize: 16),
             ),
             Text(
-              'Preço: \$${property['price']}',
+              'Preço: \$${property!['price']}',
               style: TextStyle(fontSize: 16),
             ),
             SizedBox(height: 10),
-            Text(
-              'Máximo de hóspedes: ${property['max_guest']}',
-              style: TextStyle(fontSize: 16),
-            ),
-            Text(
-              'UF: ${property['uf']}',
-              style: TextStyle(fontSize: 16),
-            ),
-            Text(
-              'Bairro: ${property['bairro']}',
-              style: TextStyle(fontSize: 16),
-            ),
-            Text(
-              'Número: ${property['number']}',
-              style: TextStyle(fontSize: 16),
-            ),
-            Text(
-              'Complemento: ${property['complement'] ?? 'Não possui'}',
-              style: TextStyle(fontSize: 16),
-            ),
-            if (property['thumbnail'] != null && Uri.tryParse(property['thumbnail'])?.isAbsolute == true)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Image.network(
-                  property['thumbnail'],
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Check-in: ${_checkinDate != null ? DateFormat('dd/MM/yyyy').format(_checkinDate!) : "Selecionar"}'),
+                ElevatedButton(
+                  onPressed: () => _selectDate(context, true),
+                  child: Text("Selecionar"),
                 ),
-              ),
-                Spacer(),
-                Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                  // Ação ao clicar no botão
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Check-out: ${_checkoutDate != null ? DateFormat('dd/MM/yyyy').format(_checkoutDate!) : "Selecionar"}'),
+                ElevatedButton(
+                  onPressed: () => _selectDate(context, false),
+                  child: Text("Selecionar"),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Hóspedes: $_guests'),
+                DropdownButton<int>(
+                  value: _guests,
+                  onChanged: (int? newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _guests = newValue;
+                      });
+                    }
                   },
-                  child: Text('Reservar'),
+                  items: List.generate(
+                    property!['max_guest'],
+                    (index) => DropdownMenuItem(
+                      value: index + 1,
+                      child: Text("${index + 1}"),
+                    ),
+                  ),
                 ),
+              ],
+            ),
+            Spacer(),
+            Center(
+              child: ElevatedButton(
+                onPressed: _bookProperty,
+                child: Text('Reservar'),
               ),
+            ),
           ],
         ),
       ),
