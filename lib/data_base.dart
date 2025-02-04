@@ -320,4 +320,30 @@ class DataBaseHelper {
     print('Reserva criada com sucesso!');
     return true;
   }
+
+  Future<bool> checkUserBookingConflict(int userId, String checkinDate, String checkoutDate) async {
+    final db = await initializedDataBase();
+
+    final List<Map<String, dynamic>> conflicts = await db.rawQuery(
+      '''
+      SELECT * FROM booking 
+      WHERE user_id = ? 
+      AND (
+        (checkin_date BETWEEN ? AND ?) OR 
+        (checkout_date BETWEEN ? AND ?) OR
+        (? BETWEEN checkin_date AND checkout_date) OR
+        (? BETWEEN checkin_date AND checkout_date)
+      )
+      ''',
+      [userId, checkinDate, checkoutDate, checkinDate, checkoutDate, checkinDate, checkoutDate],
+    );
+
+    if (conflicts.isNotEmpty) {
+      print('User has booking conflicts for the selected dates.');
+      return true;
+    } else {
+      print('No booking conflicts for the user.');
+      return false;
+    }
+  }
 }
