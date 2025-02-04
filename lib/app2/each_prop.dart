@@ -1,6 +1,19 @@
 import 'package:flutter/material.dart';
 
-class EachProperty extends StatelessWidget {
+class EachProperty extends StatefulWidget {
+  @override
+  _EachPropertyState createState() => _EachPropertyState();
+}
+
+class _EachPropertyState extends State<EachProperty> {
+
+
+
+
+
+
+
+  
   @override
   Widget build(BuildContext context) {
     // Obtém os argumentos passados pelo Navigator
