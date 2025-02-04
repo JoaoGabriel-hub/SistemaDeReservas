@@ -399,4 +399,25 @@ class DataBaseHelper {
       return [];
     }
   }
+
+  Future<double> calculateRating(int propertyId) async {
+    final db = await initializedDataBase();
+    final List<Map<String, dynamic>> ratings = await db.query(
+      'booking',
+      columns: ['rating'],
+      where: 'property_id = ? AND rating IS NOT NULL',
+      whereArgs: [propertyId],
+    );
+
+    if (ratings.isEmpty) {
+      print('No ratings found for this property');
+      return 0.0;
+    }
+
+    double totalRating = ratings.fold(0.0, (sum, item) => sum + (item['rating'] as double));
+    double averageRating = totalRating / ratings.length;
+
+    print('Average rating calculated');
+    return averageRating;
+  }
 }
