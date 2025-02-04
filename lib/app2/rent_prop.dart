@@ -31,17 +31,27 @@ class _RentPropertyState extends State<RentProperty> {
   }
 
   Future<void> _loadProperties() async {
-    var db = DataBaseHelper();
-    try {
-      List<dynamic> properties = await db.getAllProperties();
-      setState(() {
-        _properties = properties;
-        _filteredProperties = properties;
-      });
-    } catch (e) {
-      print("Erro ao carregar propriedades: $e");
+  var db = DataBaseHelper();
+  try {
+    List<dynamic> properties = await db.getAllProperties();
+
+    // Criar uma cópia mutável da lista
+    List<Map<String, dynamic>> mutableProperties = properties.map((p) => Map<String, dynamic>.from(p)).toList();
+
+    // Preencher as avaliações de cada propriedade
+    for (var property in mutableProperties) {
+      property['rating'] = await db.calculateRating(property['id']);
     }
+
+    setState(() {
+      _properties = mutableProperties;
+      _filteredProperties = mutableProperties;
+    });
+  } catch (e) {
+    print("Erro ao carregar propriedades: $e");
   }
+}
+
 
   Future<void> _filterProperties() async {
     var db = DataBaseHelper();
@@ -212,6 +222,7 @@ class _RentPropertyState extends State<RentProperty> {
                                 children: [
                                   Text(property['description'], style: TextStyle(fontSize: 16)),
                                   SizedBox(height: 8),
+                                  Text('Avaliação média: ${property['rating'].toStringAsFixed(1)}', style: TextStyle(fontWeight: FontWeight.bold)),
                                   Text('Máximo de hóspedes: ${property['max_guest']}', style: TextStyle(color: Colors.grey[600])),
                                   Text('Preço por diária: \$${property['price']}', style: TextStyle(color: Colors.grey[600])),
                                   if (_isValidUrl(property['thumbnail']))
