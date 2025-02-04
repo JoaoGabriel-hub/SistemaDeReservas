@@ -374,4 +374,29 @@ class DataBaseHelper {
 
     return properties.where((p) => !unavailableIds.contains(p['id'])).toList();
   }
+
+  Future<List<Map<String, dynamic>>> getBookingsByUser() async {
+    final db = await initializedDataBase();
+    int? userId = LoggedUser().id;
+
+    final List<Map<String, dynamic>> bookings = await db.rawQuery('''
+    SELECT 
+      property.title, 
+      property.thumbnail,
+      booking.checkin_date, 
+      booking.checkout_date, 
+      booking.total_price
+    FROM booking
+    JOIN property ON booking.property_id = property.id
+    WHERE booking.user_id = ?
+    ''', [userId]);
+
+    if (bookings.isNotEmpty) {
+      print('Bookings found for user');
+      return bookings;
+    } else {
+      print('No bookings found for this user');
+      return [];
+    }
+  }
 }
