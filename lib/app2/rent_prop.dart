@@ -14,12 +14,15 @@ class _RentPropertyState extends State<RentProperty> {
   final TextEditingController _bairroController = TextEditingController();
   final TextEditingController _cidadeController = TextEditingController();
   final TextEditingController _maxGuestController = TextEditingController();
+  final TextEditingController _checkinController = TextEditingController();
+  final TextEditingController _checkoutController = TextEditingController();
 
   bool _showFilters = false;
   bool _filterUF = false;
   bool _filterBairro = false;
   bool _filterCidade = false;
   bool _filterMaxGuests = false;
+  bool _filterDates = false;
 
   @override
   void initState() {
@@ -39,28 +42,36 @@ class _RentPropertyState extends State<RentProperty> {
       print("Erro ao carregar propriedades: $e");
     }
   }
-  
-  bool _isValidUrl(String url) {
-    final Uri? uri = Uri.tryParse(url);
-    return uri != null && uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
-  }
 
-  void _filterProperties() {
+  Future<void> _filterProperties() async {
+    var db = DataBaseHelper();
     String uf = _ufController.text.trim().toLowerCase();
     String bairro = _bairroController.text.trim().toLowerCase();
     String cidade = _cidadeController.text.trim().toLowerCase();
     int? maxGuests = int.tryParse(_maxGuestController.text.trim());
+    String checkin = _checkinController.text.trim();
+    String checkout = _checkoutController.text.trim();
+
+    List<dynamic> filtered = _properties.where((property) {
+      bool matchesUF = !_filterUF || uf.isEmpty || property['uf'].toString().toLowerCase().contains(uf);
+      bool matchesBairro = !_filterBairro || bairro.isEmpty || property['bairro'].toString().toLowerCase().contains(bairro);
+      bool matchesCidade = !_filterCidade || cidade.isEmpty || property['localidade'].toString().toLowerCase().contains(cidade);
+      bool matchesMaxGuests = !_filterMaxGuests || maxGuests == null || property['max_guest'] >= maxGuests;
+      return matchesUF && matchesBairro && matchesCidade && matchesMaxGuests;
+    }).toList();
+
+    if (_filterDates && checkin.isNotEmpty && checkout.isNotEmpty) {
+      filtered = await db.getAvailableProperties(checkin, checkout, filtered);
+    }
 
     setState(() {
-      _filteredProperties = _properties.where((property) {
-        bool matchesUF = !_filterUF || uf.isEmpty || property['uf'].toString().toLowerCase().contains(uf);
-        bool matchesBairro = !_filterBairro || bairro.isEmpty || property['bairro'].toString().toLowerCase().contains(bairro);
-        bool matchesCidade = !_filterCidade || cidade.isEmpty || property['localidade'].toString().toLowerCase().contains(cidade);
-        bool matchesMaxGuests = !_filterMaxGuests || maxGuests == null || property['max_guest'] >= maxGuests;
-
-        return matchesUF && matchesBairro && matchesCidade && matchesMaxGuests;
-      }).toList();
+      _filteredProperties = filtered;
     });
+  }
+
+  bool _isValidUrl(String url) {
+    final Uri? uri = Uri.tryParse(url);
+    return uri != null && uri.isAbsolute && (uri.scheme == 'http' || uri.scheme == 'https');
   }
 
   @override
@@ -84,8 +95,6 @@ class _RentPropertyState extends State<RentProperty> {
               },
             ),
           ),
-
-          // Botão para exibir/ocultar filtros
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
@@ -97,8 +106,6 @@ class _RentPropertyState extends State<RentProperty> {
               child: Text(_showFilters ? 'Ocultar Filtros' : 'Buscar por'),
             ),
           ),
-
-          // Campos de filtro (exibidos apenas se ativados)
           if (_showFilters)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -117,7 +124,6 @@ class _RentPropertyState extends State<RentProperty> {
                       decoration: InputDecoration(labelText: 'Digite a UF'),
                       onChanged: (value) => _filterProperties(),
                     ),
-
                   CheckboxListTile(
                     title: Text('Buscar por Bairro'),
                     value: _filterBairro,
@@ -131,7 +137,6 @@ class _RentPropertyState extends State<RentProperty> {
                       decoration: InputDecoration(labelText: 'Digite o Bairro'),
                       onChanged: (value) => _filterProperties(),
                     ),
-
                   CheckboxListTile(
                     title: Text('Buscar por Cidade'),
                     value: _filterCidade,
@@ -145,7 +150,6 @@ class _RentPropertyState extends State<RentProperty> {
                       decoration: InputDecoration(labelText: 'Digite a Cidade'),
                       onChanged: (value) => _filterProperties(),
                     ),
-
                   CheckboxListTile(
                     title: Text('Máximo de Hóspedes'),
                     value: _filterMaxGuests,
@@ -160,11 +164,31 @@ class _RentPropertyState extends State<RentProperty> {
                       decoration: InputDecoration(labelText: 'Digite o máximo de hóspedes'),
                       onChanged: (value) => _filterProperties(),
                     ),
+                  CheckboxListTile(
+                    title: Text('Buscar por Data de Check-in e Check-out'),
+                    value: _filterDates,
+                    onChanged: (value) {
+                      setState(() => _filterDates = value!);
+                    },
+                  ),
+                  if (_filterDates) ...[
+                    TextField(
+                      controller: _checkinController,
+                      decoration: InputDecoration(labelText: 'Data de Check-in (YYYY-MM-DD)'),
+                    ),
+                    TextField(
+                      controller: _checkoutController,
+                      decoration: InputDecoration(labelText: 'Data de Check-out (YYYY-MM-DD)'),
+                    ),
+                  ],
+                  ElevatedButton(
+                    onPressed: _filterProperties,
+                    child: Text('Aplicar Filtros'),
+                  ),
                 ],
               ),
             ),
-
-          Expanded(
+            Expanded(
             child: _filteredProperties.isEmpty
                 ? Center(child: Text('Nenhuma propriedade encontrada'))
                 : ListView.builder(
