@@ -95,9 +95,22 @@ class _EachPropertyState extends State<EachProperty> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
+            Text('UF: ${property!['uf']}', style: TextStyle(fontSize: 16)),
             Text('Localização: ${property!['localidade']}', style: TextStyle(fontSize: 16)),
-            Text('Preço: \$${property!['price']}', style: TextStyle(fontSize: 16)),
-            SizedBox(height: 10),
+            Text('Bairro: ${property!['bairro']}', style: TextStyle(fontSize: 16)),
+            Text('Número: ${property!['numero']}', style: TextStyle(fontSize: 16)),
+            Text('Complemento: ${property!['complemento']}', style: TextStyle(fontSize: 16)),
+            Text('Preço por diária: \$${property!['price']}', style: TextStyle(fontSize: 16)),
+            if (property?['thumbnail'] != null && Uri.tryParse(property?['thumbnail'])?.isAbsolute == true)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Image.network(
+                  property?['thumbnail'],
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  )
+                ),
             
             if (_showForm) ...[
               Row(
