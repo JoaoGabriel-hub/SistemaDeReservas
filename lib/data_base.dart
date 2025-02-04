@@ -258,4 +258,66 @@ class DataBaseHelper {
     );
     print('Property updated');
   }
+
+
+  Future<bool> insertBooking(int propertyId, String checkinDate, String checkoutDate, int guests) async {
+    final db = await initializedDataBase();
+    int? userId = LoggedUser().id;
+
+    // Verifica se há conflitos de reserva para as datas selecionadas
+    final List<Map<String, dynamic>> conflicts = await db.rawQuery(
+      '''
+      SELECT * FROM booking 
+      WHERE property_id = ? 
+      AND (
+        (checkin_date BETWEEN ? AND ?) OR 
+        (checkout_date BETWEEN ? AND ?) OR
+        (? BETWEEN checkin_date AND checkout_date) OR
+        (? BETWEEN checkin_date AND checkout_date)
+      )
+      ''',
+      [propertyId, checkinDate, checkoutDate, checkinDate, checkoutDate, checkinDate, checkoutDate],
+    );
+
+    if (conflicts.isNotEmpty) {
+      print('Conflito de reserva encontrado! Escolha outras datas.');
+      return false;
+    }
+
+    // Obtém o preço da propriedade
+    final List<Map<String, dynamic>> property = await db.query(
+      'property',
+      columns: ['price'],
+      where: 'id = ?',
+      whereArgs: [propertyId],
+      limit: 1,
+    );
+
+    if (property.isEmpty) {
+      print('Propriedade não encontrada!');
+      return false;
+    }
+
+    double pricePerNight = property.first['price'] as double;
+    int totalDays = DateTime.parse(checkoutDate).difference(DateTime.parse(checkinDate)).inDays;
+    double totalPrice = totalDays * pricePerNight;
+
+    // Insere a reserva na tabela
+    await db.insert(
+      'booking',
+      {
+        'user_id': userId,
+        'property_id': propertyId,
+        'checkin_date': checkinDate,
+        'checkout_date': checkoutDate,
+        'total_days': totalDays,
+        'total_price': totalPrice,
+        'amount_guest': guests,
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    print('Reserva criada com sucesso!');
+    return true;
+  }
 }
