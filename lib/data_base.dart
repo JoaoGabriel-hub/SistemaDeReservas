@@ -346,4 +346,32 @@ class DataBaseHelper {
       return false;
     }
   }
+
+  Future<List<dynamic>> getAvailableProperties(String checkin, String checkout, List<dynamic> properties) async {
+    final db = await initializedDataBase();
+    List<int> unavailableIds = [];
+
+    for (var property in properties) {
+      int propertyId = property['id'];
+      final List<Map<String, dynamic>> conflicts = await db.rawQuery(
+        '''
+        SELECT * FROM booking 
+        WHERE property_id = ?
+        AND (
+          (checkin_date BETWEEN ? AND ?) OR 
+          (checkout_date BETWEEN ? AND ?) OR
+          (? BETWEEN checkin_date AND checkout_date) OR
+          (? BETWEEN checkin_date AND checkout_date)
+        )
+        ''',
+        [propertyId, checkin, checkout, checkin, checkout, checkin, checkout],
+      );
+
+      if (conflicts.isNotEmpty) {
+        unavailableIds.add(propertyId);
+      }
+    }
+
+    return properties.where((p) => !unavailableIds.contains(p['id'])).toList();
+  }
 }
