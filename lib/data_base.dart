@@ -259,8 +259,7 @@ class DataBaseHelper {
     print('Property updated');
   }
 
-
-  Future<bool> insertBooking(int propertyId, String checkinDate, String checkoutDate, int guests) async {
+  Future<bool> insertBooking(int propertyId, String checkinDate, String checkoutDate, int guests, double? rating) async {
     final db = await initializedDataBase();
     int? userId = LoggedUser().id;
 
@@ -313,6 +312,7 @@ class DataBaseHelper {
         'total_days': totalDays,
         'total_price': totalPrice,
         'amount_guest': guests,
+        'rating': rating,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
