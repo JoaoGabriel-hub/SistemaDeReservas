@@ -159,6 +159,7 @@ class _EachPropertyState extends State<EachProperty> {
             Text('Número: ${property!['numero']}', style: TextStyle(fontSize: 16)),
             Text('Complemento: ${property!['complemento']}', style: TextStyle(fontSize: 16)),
             Text('Preço por diária: R\$${property!['price']}', style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
             if (property?['thumbnail'] != null && Uri.tryParse(property?['thumbnail'])?.isAbsolute == true)
               Padding(
                 padding: const EdgeInsets.only(top: 10),
@@ -180,6 +181,7 @@ class _EachPropertyState extends State<EachProperty> {
                 ),
               ],
             ),
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -190,6 +192,7 @@ class _EachPropertyState extends State<EachProperty> {
                 ),
               ],
             ),
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
