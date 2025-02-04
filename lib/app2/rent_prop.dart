@@ -87,12 +87,14 @@ class _RentPropertyState extends State<RentProperty> {
                 const PopupMenuItem<String>(value: 'logout', child: Text('Deslogar')),
                 const PopupMenuItem<String>(value: 'reservas', child: Text('Minhas reservas')),
               ],
-              onSelected: (String result) {
+                onSelected: (String result) {
                 if (result == 'logout') {
                   LoggedUser().logout();
                   Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
+                } else if (result == 'reservas') {
+                  Navigator.pushNamed(context, '/reservations');
                 }
-              },
+                },
             ),
           ),
           Padding(
