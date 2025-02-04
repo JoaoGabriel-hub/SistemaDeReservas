@@ -186,13 +186,8 @@ class _RentPropertyState extends State<RentProperty> {
                                 children: [
                                   Text(property['description'], style: TextStyle(fontSize: 16)),
                                   SizedBox(height: 8),
-                                  Text('UF: ${property['uf']}', style: TextStyle(color: Colors.grey[600])),
-                                  Text('Localidade: ${property['localidade']}', style: TextStyle(color: Colors.grey[600])),
-                                  Text('Bairro: ${property['bairro']}', style: TextStyle(color: Colors.grey[600])),
                                   Text('Máximo de hóspedes: ${property['max_guest']}', style: TextStyle(color: Colors.grey[600])),
-                                  Text('Preço: \$${property['price']}', style: TextStyle(color: Colors.grey[600])),
-                                  Text('Número: ${property['number']}', style: TextStyle(color: Colors.grey[600])),
-                                  Text('Complemento: ${property['complement'] ?? 'Não possui'}', style: TextStyle(color: Colors.grey[600])),
+                                  Text('Preço por diária: \$${property['price']}', style: TextStyle(color: Colors.grey[600])),
                                   if (_isValidUrl(property['thumbnail']))
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
