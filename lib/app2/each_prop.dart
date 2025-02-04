@@ -14,6 +14,7 @@ class _EachPropertyState extends State<EachProperty> {
   DateTime? _checkinDate;
   DateTime? _checkoutDate;
   int _guests = 1;
+  bool _showForm = false;
 
   @override
   void didChangeDependencies() {
@@ -31,7 +32,7 @@ class _EachPropertyState extends State<EachProperty> {
       firstDate: firstDate,
       lastDate: lastDate,
     );
-    if (pickedDate != null && pickedDate != (isCheckin ? _checkinDate : _checkoutDate)) {
+    if (pickedDate != null) {
       setState(() {
         if (isCheckin) {
           _checkinDate = pickedDate;
@@ -45,13 +46,18 @@ class _EachPropertyState extends State<EachProperty> {
     }
   }
 
+  void _toggleForm() {
+    setState(() {
+      _showForm = true;
+    });
+  }
+
   void _bookProperty() async {
     if (property == null || _checkinDate == null || _checkoutDate == null) return;
     int propertyId = property!['id'];
     String checkinDate = DateFormat('yyyy-MM-dd').format(_checkinDate!);
     String checkoutDate = DateFormat('yyyy-MM-dd').format(_checkoutDate!);
 
-    // Verifica se o usuário já tem uma reserva nesse período
     int? userId = LoggedUser().id;
     bool hasConflict = await _dbHelper.checkUserBookingConflict(userId!, checkinDate, checkoutDate);
 
@@ -63,16 +69,9 @@ class _EachPropertyState extends State<EachProperty> {
     }
 
     bool success = await _dbHelper.insertBooking(propertyId, checkinDate, checkoutDate, _guests);
-    
-    if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Reserva realizada com sucesso!")),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Falha ao realizar a reserva. Escolha outras datas.")),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(success ? "Reserva realizada com sucesso!" : "Falha ao realizar a reserva. Escolha outras datas.")),
+    );
   }
 
   @override
@@ -96,65 +95,69 @@ class _EachPropertyState extends State<EachProperty> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
-            Text(
-              'Localização: ${property!['localidade']}',
-              style: TextStyle(fontSize: 16),
-            ),
-            Text(
-              'Preço: \$${property!['price']}',
-              style: TextStyle(fontSize: 16),
-            ),
+            Text('Localização: ${property!['localidade']}', style: TextStyle(fontSize: 16)),
+            Text('Preço: \$${property!['price']}', style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Check-in: ${_checkinDate != null ? DateFormat('dd/MM/yyyy').format(_checkinDate!) : "Selecionar"}'),
-                ElevatedButton(
-                  onPressed: () => _selectDate(context, true),
-                  child: Text("Selecionar"),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Check-out: ${_checkoutDate != null ? DateFormat('dd/MM/yyyy').format(_checkoutDate!) : "Selecionar"}'),
-                ElevatedButton(
-                  onPressed: () => _selectDate(context, false),
-                  child: Text("Selecionar"),
-                ),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Hóspedes: $_guests'),
-                DropdownButton<int>(
-                  value: _guests,
-                  onChanged: (int? newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _guests = newValue;
-                      });
-                    }
-                  },
-                  items: List.generate(
-                    property!['max_guest'],
-                    (index) => DropdownMenuItem(
-                      value: index + 1,
-                      child: Text("${index + 1}"),
+            
+            if (_showForm) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Check-in: ${_checkinDate != null ? DateFormat('dd/MM/yyyy').format(_checkinDate!) : "Selecionar"}'),
+                  ElevatedButton(
+                    onPressed: () => _selectDate(context, true),
+                    child: Text("Selecionar"),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Check-out: ${_checkoutDate != null ? DateFormat('dd/MM/yyyy').format(_checkoutDate!) : "Selecionar"}'),
+                  ElevatedButton(
+                    onPressed: () => _selectDate(context, false),
+                    child: Text("Selecionar"),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Hóspedes: $_guests'),
+                  DropdownButton<int>(
+                    value: _guests,
+                    onChanged: (int? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          _guests = newValue;
+                        });
+                      }
+                    },
+                    items: List.generate(
+                      property!['max_guest'],
+                      (index) => DropdownMenuItem(
+                        value: index + 1,
+                        child: Text("${index + 1}"),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            Spacer(),
-            Center(
-              child: ElevatedButton(
-                onPressed: _bookProperty,
-                child: Text('Reservar'),
+                ],
               ),
-            ),
+              Spacer(),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _bookProperty,
+                  child: Text('Reservar'),
+                ),
+              ),
+            ] else ...[
+              Center(
+                child: ElevatedButton(
+                  onPressed: _toggleForm,
+                  child: Text('Reservar'),
+                ),
+              ),
+            ],
           ],
         ),
       ),
