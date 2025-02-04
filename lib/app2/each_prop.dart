@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projetofinal/data_base.dart';
 import 'package:intl/intl.dart';
+import 'package:projetofinal/logged_user.dart';
 
 class EachProperty extends StatefulWidget {
   @override
@@ -49,6 +50,17 @@ class _EachPropertyState extends State<EachProperty> {
     int propertyId = property!['id'];
     String checkinDate = DateFormat('yyyy-MM-dd').format(_checkinDate!);
     String checkoutDate = DateFormat('yyyy-MM-dd').format(_checkoutDate!);
+
+    // Verifica se o usuário já tem uma reserva nesse período
+    int? userId = LoggedUser().id;
+    bool hasConflict = await _dbHelper.checkUserBookingConflict(userId!, checkinDate, checkoutDate);
+
+    if (hasConflict) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Você já possui uma reserva nesse período.")),
+      );
+      return;
+    }
 
     bool success = await _dbHelper.insertBooking(propertyId, checkinDate, checkoutDate, _guests);
     
