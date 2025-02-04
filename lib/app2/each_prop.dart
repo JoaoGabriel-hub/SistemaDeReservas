@@ -14,6 +14,7 @@ class _EachPropertyState extends State<EachProperty> {
   DateTime? _checkinDate;
   DateTime? _checkoutDate;
   int _guests = 1;
+  double _rating = 0;
 
   @override
   void didChangeDependencies() {
@@ -45,34 +46,65 @@ class _EachPropertyState extends State<EachProperty> {
     }
   }
 
-  void _showConfirmationDialog() {
+    void _showConfirmationDialog() {
     if (_checkinDate == null || _checkoutDate == null) return;
     int days = _checkoutDate!.difference(_checkinDate!).inDays + 1;
     double totalPrice = days * (property!['price'] as double? ?? 0.0);
+    double _selectedRating = _rating; // Variável local
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Confirmar Reserva"),
-          content: Text(
-            "Check-in: ${DateFormat('dd/MM/yyyy').format(_checkinDate!)}\n"
-            "Check-out: ${DateFormat('dd/MM/yyyy').format(_checkoutDate!)}\n"
-            "Preço Total: \$${totalPrice.toStringAsFixed(2)}",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancelar"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _bookProperty();
-              },
-              child: Text("Confirmar Reserva"),
-            ),
-          ],
+        return StatefulBuilder( // Permite atualização dentro do diálogo
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Text("Confirmar Reserva"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "Check-in: ${DateFormat('dd/MM/yyyy').format(_checkinDate!)}\n"
+                    "Check-out: ${DateFormat('dd/MM/yyyy').format(_checkoutDate!)}\n"
+                    "Preço Total: R\$${totalPrice.toStringAsFixed(2)}",
+                  ),
+                  SizedBox(height: 10),
+                  Text("Avaliação (0 a 5):"),
+                  DropdownButton<double>(
+                    value: _selectedRating,
+                    onChanged: (double? newValue) {
+                      if (newValue != null) {
+                        setDialogState(() { // Atualiza o estado dentro do diálogo
+                          _selectedRating = newValue;
+                        });
+                      }
+                    },
+                    items: List.generate(6, (index) => index.toDouble())
+                        .map((value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(value.toString()),
+                            ))
+                        .toList(),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("Cancelar"),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _rating = _selectedRating; // Atualiza a variável global ao confirmar
+                    });
+                    Navigator.pop(context);
+                    _bookProperty();
+                  },
+                  child: Text("Confirmar Reserva"),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -94,7 +126,7 @@ class _EachPropertyState extends State<EachProperty> {
       return;
     }
 
-    bool success = await _dbHelper.insertBooking(propertyId, checkinDate, checkoutDate, _guests);
+    bool success = await _dbHelper.insertBooking(propertyId, checkinDate, checkoutDate, _guests, _rating);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(success ? "Reserva realizada com sucesso!" : "Falha ao realizar a reserva. Escolha outras datas.")),
     );
@@ -126,7 +158,7 @@ class _EachPropertyState extends State<EachProperty> {
             Text('Bairro: ${property!['bairro']}', style: TextStyle(fontSize: 16)),
             Text('Número: ${property!['numero']}', style: TextStyle(fontSize: 16)),
             Text('Complemento: ${property!['complemento']}', style: TextStyle(fontSize: 16)),
-            Text('Preço por diária: \$${property!['price']}', style: TextStyle(fontSize: 16)),
+            Text('Preço por diária: R\$${property!['price']}', style: TextStyle(fontSize: 16)),
             if (property?['thumbnail'] != null && Uri.tryParse(property?['thumbnail'])?.isAbsolute == true)
               Padding(
                 padding: const EdgeInsets.only(top: 10),
