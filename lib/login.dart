@@ -36,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   } catch (e) {
-    // Log e exiba uma mensagem amigável
     print("Erro ao validar login: $e");
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Erro ao processar o login. Tente novamente.')),
@@ -85,7 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   if (_formKey.currentState!.validate()) {
                     _validateLogin();
                   }
-                  if (/*Criar o validador no banco*/ true) {}
                 },
                 child: Text('Login'),
               ),

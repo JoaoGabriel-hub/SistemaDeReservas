@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projetofinal/logged_user.dart';
+//import 'package:projetofinal/logged_user.dart';
 
 class Intermediario extends StatefulWidget {
   @override
@@ -14,26 +14,25 @@ class _IntermediarioState extends State<Intermediario> {
         title: Text('Intermediario'),
       ),
       body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              print(LoggedUser().id);
-              Navigator.pushNamed(context, '/manage_prop');
-            },
-            child: Text('Gerenciar suas propriedades'),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              print(LoggedUser().id);
-              Navigator.pushNamed(context, '/rent_prop');
-            },
-            child: Text('Reservar propriedade'),
-          ),
-        ],
-      )),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/manage_prop');
+              },
+              child: Text('Gerenciar suas propriedades'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/rent_prop');
+              },
+              child: Text('Reservar propriedade'),
+            ),
+          ],
+        )
+      ),
     );
   }
 }

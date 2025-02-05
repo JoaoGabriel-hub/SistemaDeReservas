@@ -22,7 +22,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
 
   void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Process data
       String name = _nameController.text;
       String email = _emailController.text;
       String password = _passwordController.text;
@@ -38,7 +37,6 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
           SnackBar(content: Text('Erro ao criar usuário')),
         );
       }
-      // You can add your user creation logic here
     }
   }
 

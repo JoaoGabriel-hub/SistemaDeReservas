@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:projetofinal/data_base.dart';
-import 'package:image_picker/image_picker.dart'; // Importação adicionada
-import 'dart:io'; // Importação adicionada
+import 'package:image_picker/image_picker.dart'; 
+import 'dart:io'; 
 import 'main_manage_prop.dart';
 
-class CreatePropertyScreen extends StatefulWidget { // Alterado para StatefulWidget
+class CreatePropertyScreen extends StatefulWidget { 
   @override
   _CreatePropertyScreenState createState() => _CreatePropertyScreenState();
 }
@@ -19,9 +19,9 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
   final _maxGuestController = TextEditingController();
   final _thumbnailController = TextEditingController();
   final _cepController = TextEditingController();
-  final List<File?> _imageFiles = [null]; // Lista de arquivos de imagem
+  final List<File?> _imageFiles = [null]; 
 
-  final ImagePicker _picker = ImagePicker(); // Instância do ImagePicker
+  final ImagePicker _picker = ImagePicker(); 
 
   void _addImageField() {
     setState(() {
@@ -60,7 +60,7 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20), // Espaçamento adicionado
+              SizedBox(height: 20), 
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(labelText: 'Descrição'),
@@ -71,7 +71,7 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20), // Espaçamento adicionado
+              SizedBox(height: 20), 
               TextFormField(
                 controller: _numberController,
                 decoration: InputDecoration(labelText: 'Número'),
@@ -85,16 +85,15 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20), // Espaçamento adicionado
+              SizedBox(height: 20), 
               TextFormField(
                 controller: _complementController,
                 decoration: InputDecoration(labelText: 'Complemento'),
                 validator: (value) {
-                  // Campo opcional, não precisa de validação
                   return null;
                 },
               ),
-              SizedBox(height: 20), // Espaçamento adicionado
+              SizedBox(height: 20), 
               TextFormField(
                 controller: _priceController,
                 decoration: InputDecoration(labelText: 'Preço'),
@@ -108,7 +107,7 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20), // Espaçamento adicionado
+              SizedBox(height: 20), 
               TextFormField(
                 controller: _maxGuestController,
                 decoration: InputDecoration(labelText: 'Máximo de Convidados'),
@@ -122,7 +121,7 @@ class _CreatePropertyScreenState extends State<CreatePropertyScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 20), // Espaçamento adicionado
+              SizedBox(height: 20), 
               TextFormField(
                 controller: _thumbnailController,
                 decoration: InputDecoration(labelText: 'Thumbnail URL'),

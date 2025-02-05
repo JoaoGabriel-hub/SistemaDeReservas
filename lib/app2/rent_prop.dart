@@ -34,18 +34,11 @@ class _RentPropertyState extends State<RentProperty> {
     var db = DataBaseHelper();
     try {
       List<dynamic> properties = await db.getAllProperties();
-
-      // Criar uma cópia mutável da lista
       List<Map<String, dynamic>> mutableProperties = properties.map((p) => Map<String, dynamic>.from(p)).toList();
-
-      // Preencher as avaliações de cada propriedade
       for (var property in mutableProperties) {
         property['rating'] = await db.calculateRating(property['id']);
       }
-
-      // Ordenar por rating em ordem decrescente
       mutableProperties.sort((a, b) => b['rating'].compareTo(a['rating']));
-
       setState(() {
         _properties = mutableProperties;
         _filteredProperties = mutableProperties;

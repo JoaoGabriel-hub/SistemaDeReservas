@@ -50,12 +50,12 @@ class _EachPropertyState extends State<EachProperty> {
     if (_checkinDate == null || _checkoutDate == null) return;
     int days = _checkoutDate!.difference(_checkinDate!).inDays + 1;
     double totalPrice = days * (property!['price'] as double? ?? 0.0);
-    double _selectedRating = _rating; // Variável local
+    double _selectedRating = _rating; 
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return StatefulBuilder( // Permite atualização dentro do diálogo
+        return StatefulBuilder( 
           builder: (context, setDialogState) {
             return AlertDialog(
               title: Text("Confirmar Reserva"),
@@ -73,7 +73,7 @@ class _EachPropertyState extends State<EachProperty> {
                     value: _selectedRating,
                     onChanged: (double? newValue) {
                       if (newValue != null) {
-                        setDialogState(() { // Atualiza o estado dentro do diálogo
+                        setDialogState(() { 
                           _selectedRating = newValue;
                         });
                       }
@@ -95,7 +95,7 @@ class _EachPropertyState extends State<EachProperty> {
                 ElevatedButton(
                   onPressed: () {
                     setState(() {
-                      _rating = _selectedRating; // Atualiza a variável global ao confirmar
+                      _rating = _selectedRating; 
                     });
                     Navigator.pop(context);
                     _bookProperty();

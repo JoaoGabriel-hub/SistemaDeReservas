@@ -41,7 +41,6 @@ class DeletePropertiesScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Propriedade excluída com sucesso')),
     );
-    // Recarregar a lista de propriedades
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => DeletePropertiesScreen()),
     );

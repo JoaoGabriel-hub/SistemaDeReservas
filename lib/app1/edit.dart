@@ -127,12 +127,10 @@ class EditPropertiesScreen extends StatelessWidget {
                     
                   );
                   Navigator.of(context).pop();
-                  // Recarregar a página
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => EditPropertiesScreen()),
                   );
                 } else {
-                  // Mostrar mensagem de erro
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Todos os campos devem ser preenchidos de forma correta')),
                   );

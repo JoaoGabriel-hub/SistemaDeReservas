@@ -112,7 +112,6 @@ class DataBaseHelper {
       List<String> images) async {
     final db = await initializedDataBase();
     int? userId = LoggedUser().id;
-    //Consumir API do cep para obter o endereço completo
     var adressId = await createAdress(cep);
     var propertyId = await db.insert(
       'property',
@@ -171,7 +170,7 @@ class DataBaseHelper {
           'bairro': data['bairro'],
           'localidade': data['localidade'],
           'uf': data['uf'],
-          'estado': data['estado'], // Assuming 'estado' is the same as 'uf'
+          'estado': data['estado'], 
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );

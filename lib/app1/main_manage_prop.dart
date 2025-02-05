@@ -18,26 +18,25 @@ class _ManagePropertyState extends State<ManageProperty> {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                // Add your create property logic here
                 Navigator.pushNamed(context, '/create_prop');
               },
               child: Text('Criar Propriedade'),
             ),
-            SizedBox(height: 20), // Espaçamento adicionado
+            SizedBox(height: 20), 
             ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/list_prop');
               },
               child: Text('Listar Propriedades'),
             ),
-            SizedBox(height: 20), // Espaçamento adicionado
+            SizedBox(height: 20), 
             ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/delete_prop');
               },
               child: Text('Remover Propriedade'),
             ),
-            SizedBox(height: 20), // Espaçamento adicionado
+            SizedBox(height: 20), 
             ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/edit_prop');
